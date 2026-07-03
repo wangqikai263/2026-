@@ -1,2 +1,1 @@
-# 2026-
-包含设计文件、 项目代码、演示视频等资料
+2026Embedded Chip Design and System Development Competition
