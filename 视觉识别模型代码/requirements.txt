@@ -1,0 +1,56 @@
+# Ultralytics requirements
+# Example: pip install -r requirements.txt
+
+# Base ----------------------------------------
+matplotlib>=3.3.0
+numpy>=1.22.2 # pinned by Snyk to avoid a vulnerability
+opencv-python>=4.6.0
+pillow>=7.1.2
+pyyaml>=5.3.1
+requests>=2.23.0
+scipy>=1.4.1
+torch>=1.8.0
+torchvision>=0.9.0
+tqdm>=4.64.0
+
+# Logging -------------------------------------
+# tensorboard>=2.13.0
+# dvclive>=2.12.0
+# clearml
+# comet
+
+# Plotting ------------------------------------
+pandas>=1.1.4
+seaborn>=0.11.0
+
+# Export --------------------------------------
+# coremltools>=7.0  # CoreML export
+# onnx>=1.12.0  # ONNX export
+# onnxsim>=0.4.1  # ONNX simplifier
+# nvidia-pyindex  # TensorRT export
+# nvidia-tensorrt  # TensorRT export
+# scikit-learn==0.19.2  # CoreML quantization
+# tensorflow>=2.4.1  # TF exports (-cpu, -aarch64, -macos)
+# tflite-support
+# tensorflowjs>=3.9.0  # TF.js export
+# openvino-dev>=2023.0  # OpenVINO export
+
+# Extras --------------------------------------
+psutil  # system utilization
+py-cpuinfo  # display CPU info
+thop>=0.1.1  # FLOPs computation
+# ipython  # interactive notebook
+# albumentations>=1.0.3  # training augmentations
+# pycocotools>=2.0.6  # COCO mAP
+# roboflow
+
+# Tracking (BoxMOT) ---------------------------
+# boxmot 通过 sys.path 引用本地项目，不需要 pip install
+# 但需要确保以下 boxmot 的核心依赖已安装：
+lap>=0.4          # 线性分配问题（tracker 核心即需）
+filterpy          # Kalman filter
+gdown             # ReID 模型下载
+
+# FastAPI 服务 ---------------------------------
+fastapi>=0.100.0
+uvicorn[standard]>=0.22.0
