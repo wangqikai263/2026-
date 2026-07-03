@@ -1,0 +1,72 @@
+server:
+  port: 8080
+  tomcat:
+    basedir: ${TOMCAT_BASE_DIR:./data/tomcat}
+
+spring:
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  datasource:
+    url: ${DB_URL:jdbc:mysql://10.135.79.168:3306/shiyuan_db?useSSL=false&useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true}
+    username: ${DB_USER:root}    # 你在 MySQL 里创建的用户
+    password: ${DB_PASS:756633}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: none   # 因为我们用 Flyway 建表
+    open-in-view: false
+    properties:
+      hibernate.show_sql: false
+
+  servlet:
+    multipart:
+      max-file-size: 5GB
+      max-request-size: 5GB
+
+  mvc:
+    async:
+      # 单位毫秒，100 分钟；开发阶段可以先调大一点
+      request-timeout: 6000000
+app:
+  runtime:
+    enforce-port: ${APP_ENFORCE_PORT:true}
+    allowed-port: ${APP_ALLOWED_PORT:8080}
+  upload:
+    dir: ${UPLOAD_DIR:./data/uploads}
+  jobs:
+    dir: ${JOBS_DIR:./data/jobs}
+    worker:
+      enabled: ${JOB_WORKER_ENABLED:true}
+      stuck-reset-minutes: ${JOB_WORKER_STUCK_RESET_MINUTES:10}
+  cors:
+    allowed-origins: ${CORS_ORIGINS:http://localhost:5173,http://localhost:3000}
+  llm:
+    base-url: ${LLM_BASE_URL:https://api.deepseek.com}
+    api-key: ${LLM_API_KEY:}
+    model: ${LLM_MODEL:deepseek-chat}
+
+  modules:
+    http-timeout-seconds: ${MODULE_HTTP_TIMEOUT_SECONDS:10800}
+    max-in-memory-mb: ${MODULE_MAX_IN_MEMORY_MB:256}
+    behavior:
+      base-url: ${BEHAVIOR_MODULE_URL:http://localhost:8001}
+      recovery:
+        wait-seconds: ${BEHAVIOR_RECOVERY_WAIT_SECONDS:7200}
+        poll-interval-seconds: ${BEHAVIOR_RECOVERY_POLL_INTERVAL_SECONDS:10}
+    focus:
+      base-url: ${FOCUS_MODULE_URL:http://localhost:8002}
+
+  realtime:
+    enabled: ${REALTIME_ENABLED:true}
+    auth:
+      # Leave empty to disable token check in local development.
+      device-token: ${REALTIME_DEVICE_TOKEN:}
+    ingest:
+      max-payload-bytes: ${REALTIME_MAX_PAYLOAD_BYTES:262144}
+    query:
+      max-lookback-seconds: ${REALTIME_MAX_LOOKBACK_SECONDS:86400}
+      max-trend-minutes: ${REALTIME_MAX_TREND_MINUTES:1440}
+

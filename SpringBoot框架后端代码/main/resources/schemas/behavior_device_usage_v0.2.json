@@ -1,0 +1,163 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "behavior_device_usage v0.2.0",
+  "description": "课堂行为检测 + 多目标追踪结果（兼容 v0.1，增量扩展 track_id 与 tracks）",
+  "type": "object",
+  "required": ["schema_version", "module_name", "metadata", "summary", "timeline", "detections", "device_usage_segments"],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "0.2.0"
+    },
+    "module_name": {
+      "type": "string",
+      "const": "behavior_device_usage"
+    },
+
+    "metadata": {
+      "type": "object",
+      "required": ["video_path", "fps", "frames"],
+      "properties": {
+        "video_path": { "type": "string" },
+        "analyzed_at": { "type": "string", "format": "date-time" },
+        "model": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string" },
+            "weights": { "type": "string" }
+          }
+        },
+        "total_seconds": { "type": ["integer", "null"] },
+        "fps": { "type": "number" },
+        "frames": { "type": "integer" },
+        "sample_interval_frames": { "type": "integer" },
+        "json_path": { "type": "string" },
+
+        "tracking": {
+          "type": "object",
+          "description": "v0.2 新增：多目标追踪配置快照",
+          "properties": {
+            "enabled": { "type": "boolean", "description": "是否启用追踪" },
+            "tracker_type": {
+              "type": "string",
+              "enum": ["bytetrack", "ocsort", "botsort", "strongsort", "deepocsort", "hybridsort", "boosttrack"],
+              "description": "所选追踪器类型"
+            },
+            "mode": {
+              "type": "string",
+              "enum": ["fast", "precise"],
+              "description": "快速模式(纯运动) / 精准模式(运动+ReID外观)"
+            },
+            "per_class": { "type": "boolean", "description": "是否按类别独立追踪" },
+            "detection_interval": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "降频检测间隔（帧），tracker 每帧都执行预测"
+            }
+          },
+          "required": ["enabled", "tracker_type", "mode", "per_class", "detection_interval"]
+        }
+      }
+    },
+
+    "summary": {
+      "type": "object",
+      "properties": {
+        "total_frames": { "type": "integer" },
+        "total_segments": { "type": "integer" },
+        "avg_confidence": { "type": ["number", "null"] },
+        "total_tracks": { "type": "integer", "description": "v0.2 新增：追踪目标总数" }
+      }
+    },
+
+    "timeline": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["ts_s", "window_s"],
+        "properties": {
+          "ts_s": { "type": "number" },
+          "window_s": { "type": "number" },
+          "avg_conf": { "type": ["number", "null"] },
+          "counts": { "type": "object" },
+          "rates": { "type": "object" },
+          "class_counts": { "type": "object" }
+        }
+      }
+    },
+
+    "detections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["frame_idx", "ts_s", "boxes"],
+        "properties": {
+          "frame_idx": { "type": "integer" },
+          "ts_s": { "type": "number" },
+          "boxes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["bbox", "cls_id", "cls_name", "conf"],
+              "properties": {
+                "bbox": {
+                  "type": "array",
+                  "items": { "type": "number" },
+                  "minItems": 4, "maxItems": 4
+                },
+                "cls_id": { "type": "integer" },
+                "cls_name": { "type": "string" },
+                "conf": { "type": "number", "minimum": 0, "maximum": 1 },
+                "track_id": {
+                  "type": ["integer", "null"],
+                  "description": "v0.2 新增：多目标追踪 ID，同一视频内唯一"
+                },
+                "track_conf": {
+                  "type": ["number", "null"],
+                  "description": "v0.2 新增（可选）：轨迹关联置信度"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "tracks": {
+      "type": "array",
+      "description": "v0.2 新增：按 track_id 汇总的目标轨迹信息，供大模型做个体级分析",
+      "items": {
+        "type": "object",
+        "required": ["track_id", "cls_name", "cls_id", "first_frame", "last_frame", "first_ts_s", "last_ts_s", "duration_s", "total_frames", "avg_conf"],
+        "properties": {
+          "track_id": { "type": "integer" },
+          "cls_name": { "type": "string" },
+          "cls_id": { "type": "integer" },
+          "first_frame": { "type": "integer" },
+          "last_frame": { "type": "integer" },
+          "first_ts_s": { "type": "number" },
+          "last_ts_s": { "type": "number" },
+          "duration_s": { "type": "number" },
+          "total_frames": { "type": "integer" },
+          "avg_conf": { "type": "number" }
+        }
+      }
+    },
+
+    "device_usage_segments": {
+      "type": "array",
+      "description": "原有分段统计，v0.2 保持不变",
+      "items": {
+        "type": "object",
+        "required": ["index", "start_s", "end_s", "conf"],
+        "properties": {
+          "index": { "type": "integer" },
+          "start_s": { "type": "number" },
+          "end_s": { "type": "number" },
+          "conf": { "type": "number" }
+        },
+        "additionalProperties": true
+      }
+    }
+  }
+}
